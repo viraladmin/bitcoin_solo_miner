@@ -1,7 +1,8 @@
 # Bitcoin CPU Solo Miner
 
 This is a CPU-based Bitcoin solo miner designed primarily for educational and experimental purposes.  
-It demonstrates how to build and submit valid Bitcoin blocks without joining a mining pool or using specialized ASIC hardware.
+
+It demonstrates how to build and submit valid Bitcoin blocks without joining a mining pool or using specialized ASIC hardware.  
 
 The miner takes a novel approach compared to traditional mining loops:
 
@@ -67,12 +68,14 @@ This miner exists to:
 
 Create a `.env` file in the miner’s directory:
 
+```env
 RPC_URL="http://127.0.0.1:8332"
 RPC_USER="admin"
 RPC_PASS="pass"
 PAYOUT_ADDRESS="bc1q...."
 STRINGS_FILE="strings.txt"
 NUM_TASKS=20
+```
 
 **Explanation of fields:**
 - `RPC_URL` — URL to your Bitcoin node’s RPC endpoint.
