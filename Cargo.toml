@@ -1,6 +1,6 @@
 [package]
 name = "bitcoin_solo_miner"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 authors = ["viraladmin <bc1qks95p0aw09qhfh3e4p7qhr5qtkcg0hnf6erjph>"]
 description = "A bitcoin solo miner for CPUs that changes the metadata each loop instead of nonce."

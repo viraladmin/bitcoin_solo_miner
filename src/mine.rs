@@ -1,6 +1,6 @@
-use crate::GLOBAL_TEMPLATE;
+use crate::addresses::remove_used_address;
+use crate::{GLOBAL_TEMPLATE, PAYOUT_ADDRESS, SENTENCES};
 use crate::merkle::{ compute_root_from_branch, LAST_TXS, };
-use crate::SENTENCES;
 use crate::utils::{
     build_coinbase_tx, bits_to_target, hash_meets_target, serialize_header_to_array, 
 };
@@ -25,9 +25,15 @@ pub fn pick_random_sentence() -> &'static str {
     }
 }
 
-pub async fn mine_loop(
-    payout_address: &str,
-) -> Result<Option<MinedBlock>, Box<dyn std::error::Error + Send + Sync>> {
+pub async fn mine_loop() -> Result<Option<MinedBlock>, Box<dyn std::error::Error + Send + Sync>> {
+    let payout_address = {
+        let lock = PAYOUT_ADDRESS.read().await;
+        match &*lock {
+            Some(addr) => addr.clone(),
+            None => return Ok(None),
+        }
+    };
+
     // Get the current block template (read-only)
     let template = {
         let guard = GLOBAL_TEMPLATE.read().await;
@@ -113,6 +119,7 @@ pub async fn mine_loop(
     let header_bytes = serialize_header_to_array(&header);
     if hash_meets_target(&header_bytes, &target) {
         println!("✅ Block found!");
+        remove_used_address(&payout_address).await?;
         return Ok(Some(MinedBlock {
             header,
             transactions: txs,

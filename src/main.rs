@@ -1,3 +1,6 @@
+mod addresses;
+use addresses::rotate_payout_address;
+
 mod block_template;
 use block_template::{ BlockTemplate, fetch_block_template };
 
@@ -22,6 +25,8 @@ use utils::{build_full_block, submit_block};
 
 pub static mut SENTENCES: &[String] = &[];
 pub static GLOBAL_TEMPLATE: Lazy<RwLock<Option<(Arc<BlockTemplate>, bool)>>> = Lazy::new(|| RwLock::new(None));
+pub static PAYOUT_ADDRESS: Lazy<RwLock<Option<String>>> = Lazy::new(|| RwLock::new(None));
+
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
@@ -31,11 +36,12 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     let rpc_url = dotenvy::var("RPC_URL").expect("RPC_URL must be set");
     let rpc_user = dotenvy::var("RPC_USER").expect("RPC_USER must be set");
     let rpc_pass = dotenvy::var("RPC_PASS").expect("RPC_PASS must be set");
-    let payout_address = dotenvy::var("PAYOUT_ADDRESS").expect("PAYOUT_ADDRESS must be set");
     let strings_file = dotenvy::var("STRINGS_FILE").expect("STRINGS_FILE must be set");
 
     let client = Arc::new(Client::new());
 
+
+    rotate_payout_address();
     update_block(client.clone(), rpc_url.to_string(), rpc_user.to_string(), rpc_pass.to_string());
     load_sentences_from_file(&strings_file);
 
@@ -47,7 +53,6 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     use tokio::runtime::Runtime;
 
     for _ in 0..num_tasks {
-        let payout_address = payout_address.clone();
         let client = Arc::clone(&client);
         let rpc_url = rpc_url.clone();
         let rpc_user = rpc_user.clone();
@@ -56,7 +61,7 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
         thread::spawn(move || {
             let rt = Runtime::new().unwrap();
             loop {
-                if let Some(mined_block) = rt.block_on(mine_loop(&payout_address)).unwrap() {
+                if let Some(mined_block) = rt.block_on(mine_loop()).unwrap() {
                     let block_bytes = build_full_block(mined_block.header, mined_block.transactions);
                     rt.block_on(submit_block(&client, &rpc_url, &rpc_user, &rpc_pass, block_bytes)).unwrap();
                 }
@@ -73,12 +78,11 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
         let rpc_url_clone = rpc_url.clone();
         let rpc_user_clone = rpc_url.clone();
         let rpc_pass_clone = rpc_pass.clone();
-        let payout_address_clone = payout_address.clone();
         tokio::spawn({
             async move {
                 loop {
                     let result: Result<(), Box<dyn std::error::Error + Send + Sync>> = async {
-                        if let Some(mined_block) = mine_loop(&payout_address_clone).await? {
+                        if let Some(mined_block) = mine_loop().await? {
                             let block_bytes = build_full_block(mined_block.header, mined_block.transactions);
                             submit_block(&client, &rpc_url_clone, &rpc_user_clone, &rpc_pass_clone, block_bytes).await?;
                         }
