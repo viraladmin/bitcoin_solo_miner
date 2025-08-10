@@ -7,7 +7,7 @@ pub fn rotate_payout_address() -> () {
         async move {
             loop {
                 let path = dotenvy::var("PAYOUT_ADDRESSES").expect("PAYOUT_ADDRESSES must be set");
-                sleep(Duration::from_secs(30)).await;
+                sleep(Duration::from_secs(10)).await;
  
                 match std::fs::read_to_string(path) {
                    Ok(content) => {

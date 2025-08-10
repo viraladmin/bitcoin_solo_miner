@@ -35,7 +35,7 @@ pub fn update_block(client: Arc<Client>, rpc_url: String, rpc_user: String, rpc_
                     Err(e) => eprintln!("Error updating block template: {e}"),
                 }
 
-                sleep(Duration::from_secs(10)).await;
+                sleep(Duration::from_secs(45)).await;
             }
         }
     });

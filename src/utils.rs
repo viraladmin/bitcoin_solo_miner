@@ -73,6 +73,7 @@ pub fn load_sentences_from_file(path: &str) {
     }
 }
 
+
 pub fn bits_to_target(bits: u32) -> [u8; 32] {
     let exponent = ((bits >> 24) & 0xff) as usize;
     let mut mantissa = bits & 0x007fffff;
@@ -109,7 +110,8 @@ pub fn serialize_header_to_array(header: &bitcoin::block::Header) -> [u8; 80] {
 pub fn hash_meets_target(header: &[u8], target: &[u8; 32]) -> bool {
     let hash = sha256d::Hash::hash(header);
     let hash_bytes = hash.to_byte_array();
-    for i in (0..32).rev() {
+
+    for i in 0..32 {
         if hash_bytes[i] < target[i] {
             return true;
         } else if hash_bytes[i] > target[i] {

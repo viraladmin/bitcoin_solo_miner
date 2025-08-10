@@ -76,7 +76,7 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     for _ in 0..num_tasks {
         let client = Arc::clone(&client);
         let rpc_url_clone = rpc_url.clone();
-        let rpc_user_clone = rpc_url.clone();
+        let rpc_user_clone = rpc_user.clone();
         let rpc_pass_clone = rpc_pass.clone();
         tokio::spawn({
             async move {

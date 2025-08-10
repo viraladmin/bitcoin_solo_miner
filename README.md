@@ -17,6 +17,12 @@ If you’re going to burn CPU cycles, you might as well be trying to earn some B
 
 ---
 
+## Critical Notice
+All versions prior to **v0.1.2** contain a bug in the mining process that prevents finding valid blocks.
+Upgrade immediately to v0.1.2 or later.  
+
+---
+
 ## Show Support
 
 I make nothing creating and sharing the tools I create. I do it for my love of the space and my love of the people in the space.

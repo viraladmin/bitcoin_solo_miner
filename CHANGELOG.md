@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.1.2] - 2025-08-10
+- __Critical bug fix__ in mining algorithm
+- Added .env tempate file to release
+
+### Changed
+- Fixed `hash_meets_target` function to correctly compare the block hash and the target in __big endian__ format matching Bitcoin Core’s proof-of-work check..
+
+### Notes 
+- __All previous releases are broken and obsolete__ and should not be used due to critical bug in mining that prevented ever finding valid blocks. Upgrade Immdiately.
+
+
 ## [0.1.1] - 2025-08-07
 
 ### Added

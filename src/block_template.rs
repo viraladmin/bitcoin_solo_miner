@@ -19,6 +19,7 @@ pub struct BlockTemplate {
     pub transactions: Vec<BlockTemplateTx>,
 }
 
+
 pub async fn fetch_block_template(
     client: &Client,
     rpc_url: &str,
@@ -41,6 +42,22 @@ pub async fn fetch_block_template(
         .json::<Value>()
         .await?;
 
-    let template: BlockTemplate = serde_json::from_value(res["result"].clone())?;
+    if let Some(err) = res.get("error") {
+        if !err.is_null() {
+            // Log the whole error so you can see code/message
+            return Err(format!("getblocktemplate error: {}", err).into());
+        }
+    }
+
+    let result = res
+        .get("result")
+        .ok_or("getblocktemplate: missing 'result'")?;
+
+    if result.is_null() {
+        // Defensive: null without an error object (rare, but handle it).
+        return Err("getblocktemplate returned null result".into());
+    }
+
+    let template: BlockTemplate = serde_json::from_value(result.clone())?;
     Ok(template)
 }
